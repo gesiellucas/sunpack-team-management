@@ -1,0 +1,12 @@
+{
+    "name": "lua/sunpack-team-management",
+    "description": "Manage comapany's team and generate a custom shortcode for your wordpress site.",
+    "license": "GPL-2",
+    "authors": [
+        {
+            "name": "Gesiel Lucas",
+            "email": "gesiel.lucas@hotmail.com"
+        }
+    ],
+    "require": {}
+}

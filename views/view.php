@@ -14,7 +14,11 @@
                     </div>
                 </div>
             </div>
-            <?php if (!empty($data_spk)) : ?>
+            <?php
+
+use LuaSpk\Classes\SPKTM_Entity;
+
+ if (!empty($data_spk)) : ?>
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
@@ -31,7 +35,7 @@
                         <?php foreach ($data_spk as $value) : ?>
                             <tr>
                                 <td>
-                                    <?= Sunpack_tm::get_image($value->logo); ?>
+                                    <?= SPKTM_Entity::get_image($value->logo); ?>
                                 </td>
                                 <td><?= $value->patrocinador; ?></td>
                                 <td><?= $value->origem_verba .' - '. $value->desc_origem_verba; ?></td>

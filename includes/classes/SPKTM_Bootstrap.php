@@ -1,67 +1,52 @@
 <?php
 
-class Sunpack_tm
+namespace LuaSpk\Classes;
+
+class SPKTM_Bootstrap
 {
-    // Constantes e variaveis
+    private static $instance = null;
 
-    // Construct
-    public function __construct()
+    /**
+     * @return mixed
+     */
+    public static function instance()
     {
-    }
-
-    public static function _init()
-    {
-        try {
-            //code...
-            self::check_databases();
-        } catch (\Throwable $th) {
-            //throw $th;
+        if(self::$instance == null) {
+            self::$instance = new self;
         }
 
-        return true;
+        return self::$instance;
     }
 
-    // Banco de dados
-    private static function check_databases()
+    private function __construct()
     {
-        global $wpdb;
-        $tables = [
-            array(
-                'table' => $wpdb->prefix . "spk_projeto",
-                'sql' => 'CREATE TABLE ' . $wpdb->prefix . "spk_projeto" . ' (id INT NOT NULL AUTO_INCREMENT, nome VARCHAR(200) NOT NULL, logo VARCHAR(255), created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY(id) ) ' . $wpdb->get_charset_collate() . ';'
-            ),
-            array(
-                'table' => $wpdb->prefix . "spk_grupo",
-                'sql' => 'CREATE TABLE ' . $wpdb->prefix . "spk_grupo" . ' (id INT NOT NULL AUTO_INCREMENT, nome VARCHAR(200) NOT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY(id) ) ' . $wpdb->get_charset_collate() . ';'
-            ),
-            array(
-                'table' => $wpdb->prefix . "spk_origem_verba",
-                'sql' => 'CREATE TABLE ' . $wpdb->prefix . "spk_origem_verba" . ' (id INT NOT NULL AUTO_INCREMENT, nome VARCHAR(200) NOT NULL, descricao TEXT, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY(id) ) ' . $wpdb->get_charset_collate() . ';'
-            ),
-            array(
-                'table' => $wpdb->prefix . "spk_nivel_patrocinio",
-                'sql' => 'CREATE TABLE ' . $wpdb->prefix . "spk_nivel_patrocinio" . ' (id INT NOT NULL AUTO_INCREMENT, nome VARCHAR(200) NOT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY(id) )' . $wpdb->get_charset_collate() . ';'
-            ),
+        add_action('admin_menu', array($this, 'spktm_admin_menu'));
         
-            array(
-                'table' => $wpdb->prefix . "spk_patrocinador",
-                'sql' => 'CREATE TABLE ' . $wpdb->prefix . "spk_patrocinador" . ' (id INT NOT NULL AUTO_INCREMENT, patrocinador_id INT, grupo_id INT, origem_verba_id INT, nivel_patrocinio_id INT, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, FOREIGN KEY (patrocinador_id) REFERENCES ' . $wpdb->prefix . "spk_projeto" . '(id), FOREIGN KEY (grupo_id) REFERENCES ' . $wpdb->prefix . "spk_grupo" . '(id), FOREIGN KEY (origem_verba_id) REFERENCES '.$wpdb->prefix . "spk_origem_verba".'(id), FOREIGN KEY (nivel_patrocinio_id) REFERENCES ' . $wpdb->prefix . "spk_nivel_patrocinio" . '(id), PRIMARY KEY(id) )' . $wpdb->get_charset_collate() . ';'
-            ),
-        ];
-        
-        foreach ($tables as $value) {
-            $table_name = $wpdb->prefix . $value['table'];
-            $check_table = $wpdb->get_results("SHOW TABLES LIKE '{$table_name}'", OBJECT);
-            if (empty($check_table)) {
-                self::createTable($value['sql']);
-            }
-        }
     }
 
-    private static function createTable($sql)
+    public function spktm_admin_menu()
     {
-        return dbDelta($sql);
+        return add_menu_page(
+            'Sunpack Hahaha', // The title of the page
+            'Gestão Hahaha', // The text to display in the left-hand menu
+            'manage_options', // The capability required for access to this page
+            'gestao-hahaha',
+            array($this, 'spktm_admin_menu_view'), // The unique slug for this menu item
+            'dashicons-groups',
+            4
+        );
     }
+
+    public function spktm_admin_menu_view()
+    {
+        $entity = new SPKTM_Entity;
+        $data_spk = $entity->display_data();
+        
+        require_once( SPK_PLUGIN_DIR . '/views/view.php');
+        wp_die();
+    }
+
+    
 
     public static function get_grupos()
     {
